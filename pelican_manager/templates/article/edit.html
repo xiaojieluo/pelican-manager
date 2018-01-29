@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+
+
+    <form class="form-horizontal" method="POST">
+        {{ form.csrf_token }}
+
+      <!-- Title -->
+      <div class="form-group">
+        {{ form.title.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="title" placeholder="Title" name="title" value="{{ article.meta['title'] }}">
+        </div>
+      </div>
+
+      <!-- Authors -->
+      <div class="form-group">
+        {{ form.authors.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="authors" placeholder="Authors" name="authors" value="{{ article.meta['authors'] }}">
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        {{ form.tags.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="tags" placeholder="Tags" name="tags" value="{{ article.meta['tags'] }}">
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="form-group">
+        {{ form.status.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <select class="form-control" name="status">
+              <option value="published" {% if article.meta['status'] == 'published' %}selected="selected"{% endif %}>published</option>
+              <option value="draft" {% if article.meta['status'] == 'draft' %}selected="selected"{% endif %}>draft</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Created_at -->
+      <div class="form-group">
+        {{ form.created_at.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="created_at" placeholder="created_at" name="created_at" value="{{ article.meta['created_at'] }}">
+        </div>
+      </div>
+
+      <!-- Updated_at -->
+      <div class="form-group">
+        {{ form.updated_at.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="updated_at" placeholder="updated_at" name="updated_at" value="{{ article.meta['updated_at'] }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Save</button>
+        </div>
+      </div>
+    </form>
+
+    </div>
+</div>
+
+{% endblock %}

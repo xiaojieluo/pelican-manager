@@ -1,5 +1,5 @@
 import pytest
-from admin.config import Config
+from pelican_manager.config import Config
 import sys, os
 
 @pytest.fixture()

@@ -1,5 +1,5 @@
 import pytest
-from admin.utils import traversal
+from pelican_manager.utils import traversal
 
 def test_traversal_all_markdown_files():
     path = 'tests/articles'

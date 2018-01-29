@@ -2,7 +2,7 @@ import markdown
 import codecs
 from markdown.extensions import meta
 import sys
-from admin.article import MarkdownArticle
+from pelican_manager.article import MarkdownArticle
 import pytest
 
 @pytest.fixture()

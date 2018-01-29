@@ -1,1 +1,1 @@
-Pelican admin
+Pelican manager
