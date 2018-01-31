@@ -74,8 +74,6 @@ class Config(dict, Singleton):
     def save(self):
         ''' 将 config 写入当前工作目录的 pelican_manager.toml 文件中'''
         toml_string = toml.dumps(self)
-        print("=====")
-        print(toml_string)
         path = os.path.join(os.getcwd(), 'pelican_manager.toml')
         with open(path, 'w') as fp:
             fp.write(toml_string)
