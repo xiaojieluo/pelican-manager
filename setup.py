@@ -1,6 +1,8 @@
 import os
 import re
 import sys
+from os.path import relpath, join
+from os import walk
 
 from codecs import open
 
@@ -37,7 +39,7 @@ if sys.argv[-1] == 'publish':
     os.system('twine upload dist/*')
     sys.exit()
 
-packages = ['pelican-manager']
+packages = ['pelican_manager']
 
 requires = [
     'flask>=0.12.2',
@@ -46,13 +48,27 @@ requires = [
 test_requirements = ['pytest-httpbin==0.0.7', 'pytest-cov', 'pytest-mock', 'pytest-xdist', 'PySocks>=1.5.6, !=1.5.7', 'pytest>=2.8.0']
 
 about = {}
-with open(os.path.join(here, 'pelican-manager', '__version__.py'), 'r', 'utf-8') as f:
+with open(os.path.join(here, 'pelican_manager', '__version__.py'), 'r', 'utf-8') as f:
     exec(f.read(), about)
 
 with open('README.md', 'r', 'utf-8') as f:
     readme = f.read()
 with open('HISTORY.md', 'r', 'utf-8') as f:
     history = f.read()
+
+entry_points = {
+    'console_scripts': [
+        'pelican_manager = pelican_manager.__main__:main',
+    ]
+}
+static_folder = [relpath(join(root, name), 'pelican_manager')
+                    for root, _, names in walk(join('pelican_manager', 'static'))
+                    for name in names]
+
+templates_folder = [relpath(join(root, name), 'pelican_manager')
+                    for root, _, names in walk(join('pelican_manager', 'templates'))
+                    for name in names]
+config_folder = ['config/*.toml']
 
 setup(
     name=about['__title__'],
@@ -63,9 +79,12 @@ setup(
     author_email=about['__author_email__'],
     url=about['__url__'],
     packages=packages,
-    package_data={'': ['LICENSE', 'NOTICE'], 'requests': ['*.pem']},
-    package_dir={'requests': 'requests'},
-    include_package_data=True,
+    package_data={
+        '': ['LICENSE', 'NOTICE', 'requirements.txt'],
+        'pelican_manager': static_folder + templates_folder + config_folder,
+        },
+    package_dir={'pelican_manager': 'pelican_manager'},
+    # include_package_data=True,
     install_requires=requires,
     license=about['__license__'],
     zip_safe=False,
@@ -75,8 +94,6 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
@@ -87,6 +104,7 @@ setup(
     ),
     cmdclass={'test': PyTest},
     tests_require=test_requirements,
+    entry_points=entry_points,
     extras_require={
         'security': ['pyOpenSSL>=0.14', 'cryptography>=1.3.4', 'idna>=2.0.0'],
         'socks': ['PySocks>=1.5.6, !=1.5.7'],

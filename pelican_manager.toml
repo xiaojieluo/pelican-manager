@@ -1,0 +1,6 @@
+[server]
+debug = false
+port = 2000
+
+[blog]
+path = "tests/articles"

@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% set active_page = "setting" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+
+
+    <form class="form-horizontal" method="POST">
+        {{ form.csrf_token }}
+
+      <!-- Title -->
+      <h3>Server</h3>
+      <hr>
+
+      <!-- debug -->
+      <div class="form-group">
+        {{ form.debug.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <select class="form-control" name="debug">
+              <option value=1 {% if config['server']['debug'] == True %}selected="selected"{% endif %}>True</option>
+              <option value=0 {% if config['server']['debug'] == False %}selected="selected"{% endif %}>False</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- port -->
+      <div class="form-group">
+        {{ form.port.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="port" placeholder="Port" name="port" value="{{ config['server']['port'] }}">
+        </div>
+      </div>
+
+      <h3>blog</h3>
+      <hr>
+      <div class="form-group">
+        {{ form.path.label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="path" placeholder="path" name="path" value="{{ config['blog']['path'] }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Save</button>
+        </div>
+      </div>
+    </form>
+
+    </div>
+</div>
+
+{% endblock %}

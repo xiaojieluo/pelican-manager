@@ -1,13 +1,15 @@
 from flask import Flask
-from pelican_manager.config import Args
+from pelican_manager.config import Config
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'Security'
-app.debug = True
+def make_app():
+    config = Config()
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'Security'
+    # app.debug = config['server']['debug']
+    app.debug = False
 
-# 命令行参数实例类
-args = Args()
+    from pelican_manager.views import admin_bp, article_bp
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(article_bp)
 
-from pelican_manager.views import admin_bp, article_bp
-app.register_blueprint(admin_bp)
-app.register_blueprint(article_bp)
+    return app
