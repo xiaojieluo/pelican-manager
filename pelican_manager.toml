@@ -1,6 +1,6 @@
 [server]
-debug = false
-port = 2000
+debug = true
+port = 5000
 
 [blog]
-path = "tests/articles"
+path = "./content"
