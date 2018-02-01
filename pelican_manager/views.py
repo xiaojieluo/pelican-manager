@@ -14,11 +14,10 @@ article_bp = Blueprint('article', __name__, url_prefix='/article')
 def index():
     config = Config()
     path = os.path.join(os.getcwd(), config['blog']['path'])
-    print(config['blog'])
     articles = []
     for full_path in traversal(path):
         article = article_factory(full_path)
-        if article.meta.get('title', None):
+        if article and article.meta.get('title', None):
             articles.append(article)
 
     return render_template('index.html', articles = articles)

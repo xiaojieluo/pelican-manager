@@ -3,4 +3,4 @@ debug = true
 port = 5000
 
 [blog]
-path = "./content"
+path = "tests/content"
