@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = 'Xiaojie Luo'
 SITENAME = "llnhhy's Blog"
 SITEURL = 'http://www.llnhhy.com'
-PATH = 'tests/content'
+PATH = 'content'
 PELICANTOOL_PATH = 'content/posts'
 
 TIMEZONE = 'Asia/Shanghai'
@@ -113,7 +113,3 @@ SITE = dict(
 
 
 COPYRIGHT = '&copy; 2017-2018 Powered by <a href="https://blog.getpelican.com/" target="_blank">Pelican</a> Theme &copy; <a href="https://github.com/xiaojieluo" target="_blank">LuoXiaojie</a>'
-
-SERVER_DEBUG = '1'
-# Server running port.
-SERVER_PORT = 5000

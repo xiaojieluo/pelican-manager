@@ -4,32 +4,40 @@ from markdown.extensions import meta
 import sys
 from pelican_manager.article import MarkdownArticle, article_factory, Article, InterfaceNotImpleteException
 import pytest
+import os
 
 @pytest.fixture()
 def article(request):
-    path = "tests/articles/test.md"
+    path = "tests/content/article_with_metadata_and_contents.md"
     article = article_factory(path)
     return article
 
 def test_article_factory(article):
-    assert type(article) == MarkdownArticle
+    markdown = ['.md', '.markdown']
+    rst = ['.rst']
+    _,ext = os.path.splitext(article.path)
+    if ext in markdown:
+        assert type(article) == MarkdownArticle
 
-def test_use_article_model_to_parse_markdown_text(article):
-    assert article.meta['title'] == 'This is title'
+def test_parse_markdown(article):
+    assert article.meta['title'] is not None
 
 def test_use_article_model_to_update_metadata(article):
     status = 'draft'
-    result = article.update_meta('status', status)
+    article.update_meta('status', status)
     article.save()
-    assert result is None
     assert article.meta['status'] == status
 
-def test_article_update_meta(article):
+def test_article_update_meta():
+    article = article_factory('tests/content/no_metadata.md')
     name = 'None'
-    res = article.update_meta(name, 'Test_None')
+    article.update_meta(name, 'Hello')
+    article.update_meta('Status', 'published')
+    article.update_meta('Author', 'Xiaojie Luo')
+    article.save()
 
-    assert res == "不存在的 metadata:{}".format(name)
-
+    assert article.meta['status'] ==  'published'
+    assert article.meta['author'] == 'Xiaojie Luo'
 
 @pytest.fixture()
 def TestArticle(request):
@@ -53,6 +61,6 @@ def test_article_parse_text_raise_exception():
         test_article.update_meta('k', 'v')
 
 def test_parse_no_metadata_article():
-    path = "tests/articles/no_metadata.md"
+    path = "tests/content/article_without_metadata.md"
     article = article_factory(path)
     assert article.meta == {}

@@ -1,5 +1,5 @@
 import pytest
-from pelican_manager.utils import traversal, import_module
+from pelican_manager.utils import traversal, import_module, NotFoundPelicanConfig
 import os, sys
 
 def test_import_module():
@@ -12,10 +12,10 @@ def test_import_module():
 def test_import_module_exception():
     name = 'pelicanerror'
     path = './'
-    pelicanconf = import_module(name, path)
-    assert pelicanconf is None
+    with pytest.raises(NotFoundPelicanConfig):
+        pelicanconf = import_module(name, path)
 
 def test_traversal():
-    path = 'tests/articles'
+    path = 'tests/content'
     files = traversal(path)
-    assert 'tests/articles/test.md' in files
+    assert 'tests/content/test.md' in files
