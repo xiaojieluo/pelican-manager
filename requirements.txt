@@ -7,7 +7,6 @@ itsdangerous==0.24
 Jinja2==2.10
 Markdown==2.6.11
 MarkupSafe==1.0
-pelican-manager==0.1.1
 pluggy==0.6.0
 py==1.5.2
 six==1.11.0
