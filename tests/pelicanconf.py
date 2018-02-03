@@ -113,3 +113,7 @@ SITE = dict(
 
 
 COPYRIGHT = '&copy; 2017-2018 Powered by <a href="https://blog.getpelican.com/" target="_blank">Pelican</a> Theme &copy; <a href="https://github.com/xiaojieluo" target="_blank">LuoXiaojie</a>'
+
+SERVER_DEBUG = '0'
+# Server running port.
+SERVER_PORT = 5000

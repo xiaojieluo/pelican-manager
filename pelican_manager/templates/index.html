@@ -46,10 +46,8 @@
                 "status": function(){
                     {% if article.meta['status'] == 'draft' %}
                         return '<span class="label label-warning">draft</span>'
-                    {% elif article.meta['status'] == 'published' %}
-                        return '<span class="label label-success">published</span>'
                     {% else %}
-                        return ''
+                        return '<span class="label label-success">published</span>'
                     {% endif %}
                 }(),
                 "action": "<a href='{{ url_for('article.edit', path=article.path) }}'>Edit</a>"
