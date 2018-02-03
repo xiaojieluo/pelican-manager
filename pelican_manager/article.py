@@ -102,7 +102,7 @@ class MarkdownArticle(Article):
         '''
         name = name.capitalize()
         META_RE = re.compile('^[ ]{0,3}(?P<key>['+name+']+):\s*(?P<value>.*)')
-        END_RE = re.compile(r'(-{3}|\.{3})(\s.*)?')
+        END_RE = re.compile(r'(-{3,}|\.{3,})(\s.*)?')
         match = None
         end = None
         for line in self.text:
