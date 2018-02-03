@@ -7,11 +7,12 @@ coverage:
 clean:
 	rm -rf dist/
 	rm -rf build/
+	rm -rf pelican_manager.egg-info/
 
 build:
 	# build and upload
 	python setup.py sdist
 	python setup.py bdist_wheel
 	twine upload dist/*
-	# rm -rf dist/
-	# rm -rf build/
+	rm -rf dist/
+	rm -rf build/
