@@ -7,7 +7,7 @@ coverage:
         target: 80%
     project:
       default:
-        target: 80%
+        target: 70%
 
 comment:
   layout: "header, diff, uncovered"
