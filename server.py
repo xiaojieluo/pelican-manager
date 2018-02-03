@@ -1,5 +1,4 @@
-from pelican_manager import make_app
+from pelican_manager.__main__ import main
 
 if __name__ == '__main__':
-    app = make_app()
-    app.run()
+    main()
