@@ -23,7 +23,7 @@ class Article(object):
     def __init__(self, path):
         self.path = path
         self.parser = self.make_parser()
-        self._text = None
+        self._text = None # list
 
     @property
     def text(self):
@@ -61,7 +61,7 @@ class MarkdownArticle(Article):
     '''解析 markdown 格式的文章'''
 
     def __init__(self, path):
-        super().__init__( path)
+        super().__init__( path )
         self._meta = None
 
     @property
@@ -78,7 +78,7 @@ class MarkdownArticle(Article):
         text = input_file.read()
         self.html = self.parser.convert(text)
         self._meta = self._parse_meta()
-        return text
+        return text.split(os.linesep)
 
     def _parse_meta(self):
         ''' parser meta data.
@@ -102,26 +102,31 @@ class MarkdownArticle(Article):
         '''
         name = name.capitalize()
         META_RE = re.compile('^[ ]{0,3}(?P<key>['+name+']+):\s*(?P<value>.*)')
-        END_RE = re.compile(r'^(-{3}|\.{3})(\s.*)?')
-        lines = self.text.split('\n')
+        END_RE = re.compile(r'(-{3}|\.{3})(\s.*)?')
         match = None
-        while lines:
-            line = lines.pop(0)
-            m1 = META_RE.match(line)
-            if line.strip() == '' or END_RE.match(line):
+        end = None
+        for line in self.text:
+            meta_match = META_RE.match(line)
+            end = END_RE.match(line)
+            if meta_match or end:
                 break;
-            if m1:
-                match = m1
-                break;
-        if match:
-            self.text = self.text.replace(match.group(2), value)
+        meta_str = '{name}: {value}'.format(name=name, value=value)
+        index = 0
+        if meta_match:
+            index = self.text.index(meta_match.group()) or 0
+            self.text[index] = meta_str
         else:
-            return "不存在的 metadata:{}".format(name)
+            if end:
+                meta_split = end.group(0)
+                index = self.text.index(meta_split)
+            self.text.insert(index, meta_str)
+            self._parse_meta()
 
     def save(self):
         ''' 保存更改并更新缓存
         '''
         with open(self.path, 'w') as fp:
             fp.seek(0, 0)
-            fp.write(self.text)
+            text = '{}'.format(os.linesep).join(self.text)
+            fp.write(text)
         self.parse_text()

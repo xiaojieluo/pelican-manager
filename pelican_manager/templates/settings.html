@@ -15,20 +15,20 @@
 
       <!-- debug -->
       <div class="form-group">
-        {{ form.debug.label(class="col-sm-2 control-label") }}
+        {{ form.server_debug.label(class="col-sm-2 control-label") }}
         <div class="col-sm-10">
-          <select class="form-control" name="debug">
-              <option value=1 {% if config['server']['debug'] == True %}selected="selected"{% endif %}>True</option>
-              <option value=0 {% if config['server']['debug'] == False %}selected="selected"{% endif %}>False</option>
+          <select class="form-control" name="server_debug">
+              <option value=1 {% if config.server_debug == True %}selected="selected"{% endif %}>True</option>
+              <option value=0 {% if config.server_debug == False %}selected="selected"{% endif %}>False</option>
           </select>
         </div>
       </div>
 
       <!-- port -->
       <div class="form-group">
-        {{ form.port.label(class="col-sm-2 control-label") }}
+        {{ form.server_port.label(class="col-sm-2 control-label") }}
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="port" placeholder="Port" name="port" value="{{ config['server']['port'] }}">
+          <input type="text" class="form-control" id="port" placeholder="Port" name="server_port" value="{{ config.server_port }}">
         </div>
       </div>
 
@@ -37,7 +37,7 @@
       <div class="form-group">
         {{ form.path.label(class="col-sm-2 control-label") }}
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="path" placeholder="path" name="path" value="{{ config['blog']['path'] }}">
+          <input type="text" class="form-control" id="path" placeholder="path" name="path" value="{{ config.path }}">
         </div>
       </div>
 
