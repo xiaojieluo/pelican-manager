@@ -17,7 +17,6 @@ def parse_args(args):
 def main():
     '''enter'''
     args = parse_args(sys.argv[1:])
-    # print(args)
     app = make_app(args.config)
     config = Config()
     app.run(
