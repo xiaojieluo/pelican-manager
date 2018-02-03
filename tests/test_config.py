@@ -3,18 +3,23 @@ from pelican_manager.config import Config
 import sys, os
 
 
+def back(path):
+    text = None
+    with open('tests/config/pelicanconf.py', 'r') as fp:
+        text = fp.read()
+    with open(path, 'w') as fp:
+        fp.write(text)
+
 @pytest.fixture()
 def config(request):
     path = 'tests/pelicanconf.py'
+    back(path)
+
     with open(path, 'r') as fp:
         content = fp.read()
 
     def teardown():
-        text = None
-        with open('tests/config/pelicanconf.py', 'r') as fp:
-            text = fp.read()
-        with open(path, 'w') as fp:
-            fp.write(text)
+        back(path)
 
     request.addfinalizer(teardown)
     return Config(path)
