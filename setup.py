@@ -45,7 +45,7 @@ requires = [
     'flask>=0.12.2',
     'flask-WTF>=0.14.2'
 ]
-test_requirements = ['pytest-httpbin==0.0.7', 'pytest-cov', 'pytest-mock', 'pytest-xdist', 'PySocks>=1.5.6, !=1.5.7', 'pytest>=2.8.0']
+test_requirements = ['pytest-cov', 'pytest-mock', 'pytest>=2.8.0']
 
 about = {}
 with open(os.path.join(here, 'pelican_manager', '__version__.py'), 'r', 'utf-8') as f:
@@ -68,7 +68,7 @@ static_folder = [relpath(join(root, name), 'pelican_manager')
 templates_folder = [relpath(join(root, name), 'pelican_manager')
                     for root, _, names in walk(join('pelican_manager', 'templates'))
                     for name in names]
-config_folder = ['config/*.toml']
+config_folder = ['config/*.py']
 
 setup(
     name=about['__title__'],
