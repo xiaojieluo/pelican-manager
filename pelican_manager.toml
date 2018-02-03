@@ -1,6 +1,0 @@
-[server]
-debug = true
-port = 5000
-
-[blog]
-path = "tests/content"
