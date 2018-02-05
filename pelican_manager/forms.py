@@ -11,6 +11,6 @@ class ArticleForm(FlaskForm):
     updated_at = StringField('updated_at')
 
 class SettingForm(FlaskForm):
-    server_debug = StringField("Debug")
+    server_debug = IntegerField("Debug")
     server_port = IntegerField('Port')
     path = StringField("Path")

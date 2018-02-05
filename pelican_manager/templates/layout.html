@@ -31,6 +31,8 @@
                 </div>
                 <!-- /.container-fluid -->
             </nav>
+
+            <div class="main" id="pjax-container">
             {% with messages = get_flashed_messages() %}
               {% if messages %}
                 <ul class=flashes>
@@ -46,14 +48,20 @@
             {% endwith %}
 
             {% block content %}
-
             {% endblock %}
+            </div>
         </div>
     </body>
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.pjax.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='bootstrap-table/dist/bootstrap-table.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='bootstrap-table/dist/locale/bootstrap-table-zh-CN.js') }}" charset="utf-8"></script>
+    <!-- <script type="text/javascript">
+        $(document).pjax('a', '#pjax-container')
+        $(document).on('pjax:start', function() { NProgress.start(); });
+        $(document).on('pjax:end',   function() { NProgress.done();  });
+    </script> -->
     {% block script %}
 
     {% endblock %}

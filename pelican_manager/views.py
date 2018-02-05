@@ -23,7 +23,7 @@ def index():
             article = article_factory(full_path)
             if article and article.meta.get('title', None):
                 articles.append(article)
-
+    # return pjax('index.html', articles=articles)
     return render_template('index.html', articles = articles)
 
 @admin_bp.route('/settings', methods=['GET', 'POST'])
@@ -32,7 +32,9 @@ def settings():
     config = Config()
     if request.method == 'POST':
         if form.validate_on_submit():
-            for k, v in form.data.items():
+            data = copy.copy(form.data)
+            data['server_debug'] = bool(data['server_debug'])
+            for k, v in data.items():
                 if k != 'csrf_token':
                     config.update(k, v)
             config.save()
@@ -64,3 +66,14 @@ def edit():
         return redirect(url_for('admin.index'))
     else:
         return render_template('article/edit.html', form=form, article=article)
+
+# def pjax(template, pjax_block='content', **kwargs):
+#     if "X-PJAX" in request.headers:
+#         app = current_app
+#         app.update_template_context(kwargs)
+#         template = app.jinja_env.get_template(template)
+#         block = template.blocks[pjax_block]
+#         context = template.new_context(kwargs)
+#         return ''.join(block(context))
+#     else:
+#         return render_template(template, **kwargs)
