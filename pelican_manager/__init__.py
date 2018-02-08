@@ -14,8 +14,12 @@ def make_app(conf_path = None):
     app.config['SECRET_KEY'] = 'Security'
     app.debug = config.server_debug
 
-    from pelican_manager.views import admin_bp, article_bp
+    from pelican_manager.views import admin_bp, article_bp, setting_bp
     app.register_blueprint(admin_bp)
     app.register_blueprint(article_bp)
+    app.register_blueprint(setting_bp)
+
+    from pelican_manager.api import article_api
+    app.register_blueprint(article_api)
 
     return app
