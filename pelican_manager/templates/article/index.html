@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% macro th(field) -%}
+    {% set config_field = config.SERVER_FIELD[field] %}
+    <th
+    data-field="{{ field }}"
+    data-align="{{ config_field.get('align', 'center') }}"
+    data-sortable="{{ config_field.get('sort', 'true')|lower }}"
+    >{{ config_field.get('text') }}</th>
+{%- endmacro %}
+
+
+{% block content %}
+    <h2>Article list</h2>
+    <div id="toolbar" class="btn-group">
+    <button id="add" class="btn btn-default" title="添加">
+        <i class="glyphicon glyphicon-plus"></i> 添加
+    </button>
+    <button class="btn btn-danger" id="deleteButton" data-toggle="modal" data-target="#deleteModal" title="删除">
+        <i class="glyphicon glyphicon-minus"></i> 删除
+    </button>
+</div>
+    <table data-toggle="table" id="article-lists" class="table table-hover"
+           data-pagination="true"
+           data-detail-view="true"
+           data-detail-formatter="detailFormatter"
+           data-search="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-striped="true"
+           data-sort-stable="true"
+           data-show-pagination-switch="true"
+           data-click-to-select="false"
+           data-page-size="{{ config.page_size|int(10) }}"
+           data-unique-id="path"
+           >
+        <thead>
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="path" data-align="center" data-sortable="true">file path</th>
+                {% for field in config.SERVER_FIELD %}
+                    {{ th(field) }}
+                {% endfor %}
+                <th data-field="action" data-align="center">Action</th>
+            </tr>
+        </thead>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+              是否确认删除:
+              <div class="delete-path">
+              </div>
+              此操作不可撤销！
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="deleteConfirmButton" data-dismiss="modal">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function(key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    $(document).ready(function(){
+        var $table = $("#article-lists");
+        $.ajax({
+            url: "{{ url_for('article_api.article_list_api') }}",
+            data: {"key": "-text"},
+            success: function(data){
+                var articles = []
+                if(data.count > 0){
+                    for (var i = 0; i < data.count; i++) {
+                        var article = data.results[i].meta
+                        delete data.results[i].meta
+                        article = Object.assign(article, data.results[i])
+                        article['status'] = function(){
+                            if ("status" in article && article['status'] == "draft") {
+                                return '<span class="label label-warning">draft</span>'
+                            }else{
+                                return '<span class="label label-success">published</span>'
+                            }
+                        }(),
+                        edit_url = "{{ url_for('article.edit') }}" + "?path="+ article['path']
+                        article['action'] = "<a href="+edit_url+">Edit</a>"
+                        articles.push(article)
+                    }
+                }
+                console.log(articles)
+                $table.bootstrapTable('destroy')
+                    .bootstrapTable({
+                        data: articles,
+                        toolbar: '#toolbar',
+                        onExpandRow: function (index, row, $detail) {
+                           $detail.hide().fadeIn('slow');
+                         },
+                        onColumnSwitch: function(field, checked){
+                            update_hide_column(field, checked)
+                        },
+                    })
+                {% if config.PAGE_HIDE_COLUMN %}
+                    {% for field in config.PAGE_HIDE_COLUMN %}
+                        $table.bootstrapTable('hideColumn', 'path')
+                        $table.bootstrapTable('hideColumn', '{{ field }}')
+                    {% endfor %}
+                {% endif %}
+            },
+            error: function(data){
+                console.log(data)
+            }
+        })
+        var article_path;
+        var target;
+        $("#deleteButton").click(function(event){
+            console.log("Click")
+            var selects = $table.bootstrapTable('getAllSelections')
+            var articles = []
+            var text = ''
+            for (var i = 0; i < selects.length; i++) {
+                var article = selects[i]
+                text += '<span class="text-danger">'+article['path']+'</span><br />'
+            }
+            $(".delete-path").html(text)
+        })
+        $("#deleteConfirmButton").click(function(event){
+            var selects = $table.bootstrapTable('getAllSelections')
+            var results = [];
+            var paths;
+            for (var i = 0; i < selects.length; i++) {
+                url = "/api/articles/"+selects[i]['path']
+                console.log(url)
+                var result = [];
+                var article = selects[i]
+                $.ajax({
+                    url: url,
+                    dataType: 'json',
+                    type: 'DELETE',
+                    success: function(data){
+                        console.log("succ")
+                        result[article['path']] = 'success'
+                        $table.bootstrapTable('removeByUniqueId', article['path'])
+                    },
+                    error: function(data){
+                        console.log(data)
+                        result[article['path']] = 'error'
+                    }
+                })
+                results.push(result)
+            }
+            // message
+            new PNotify({
+                title: 'Success!',
+                text: 'That thing that you were trying to do worked.',
+                type: 'success'
+            });
+        })
+    })
+</script>
+{% endblock %}
