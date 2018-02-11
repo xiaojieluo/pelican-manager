@@ -19,6 +19,10 @@ class Config(object):
         default_path = os.path.join(here, 'config/defaultconf.py')
         self._default = self.make_config(default_path, 'defaultconf')
 
+    @property
+    def base_path(self):
+        print(self._path)
+
     @classmethod
     def monkey_patch(cls, path):
         cls.config_file = path
@@ -39,6 +43,16 @@ class Config(object):
             return getattr(self._default, key)
         return default
 
+    @property
+    def date_format(self):
+        ''' 日期格式'''
+        locale = self.get('default_lang', 'en')
+        date_format = self.get('date_format')
+        if date_format and locale in date_format:
+            return date_format[locale]
+        else:
+            return self.get('default_date_format')
+
     def update(self, key, value):
         '''更新配置
         '''
@@ -56,6 +70,8 @@ class Config(object):
             # 排除掉开头为下划线的内部变量
             if key[0] != '_':
                 key = key.upper()
+                if key == 'page_hide_column':
+                    value = ','.split(value)
                 def filter_func(line):
                     match = re.match(r'^{}(\s.*)=(.*)'.format(key), line)
                     if match:

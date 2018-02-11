@@ -14,3 +14,10 @@ class SettingForm(FlaskForm):
     server_debug = IntegerField("Debug")
     server_port = IntegerField('Port')
     path = StringField("Path")
+
+class ServerSettingForm(FlaskForm):
+    server_debug = IntegerField("Debug")
+    server_port = IntegerField('Port')
+    page_size = IntegerField('Page Size')
+    page_hide_column = StringField('hide columns')
+    title_color_with_status = IntegerField('Title color with status')

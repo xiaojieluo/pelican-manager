@@ -1,5 +1,6 @@
 from flask import Flask
 from pelican_manager.config import Config
+from flask_cors import CORS
 
 def make_app(conf_path = None):
     '''
@@ -22,4 +23,6 @@ def make_app(conf_path = None):
     from pelican_manager.api import article_api
     app.register_blueprint(article_api)
 
+    # CORS
+    cors = CORS(app, resources={r'/api/*': {'origins': '*'} })
     return app

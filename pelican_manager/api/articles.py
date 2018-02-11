@@ -4,52 +4,18 @@ from pelican_manager.config import Config
 from pelican_manager.article import article_factory
 from pelican_manager.utils import traversal
 import os
-from flask_restplus import Resource, Api, reqparse, marshal_with
+from flask_restplus import Resource, Api, reqparse, marshal_with, cors
 import datetime
 from slugify import slugify
 import time
 from .fields import article_list_fields, article_fields
 import types
 from schema import Schema
+import urllib.parse
 
 app = current_app
 article_api = Blueprint('article_api', __name__, url_prefix='/api/articles')
 api = Api(article_api)
-
-
-# def parse_article_args():
-#     ''' 解析 post 到 articles 的参数
-#     path: 文件保存目录， 当 path 不存在时， 用 slug + type 作为文件名
-#     '''
-#     config = Config()
-#     parser = reqparse.RequestParser()
-#     parser.add_argument('path', type=str, location='json', default = None, help='文章保存地址')
-#     parser.add_argument('type', type=str, location='json', default='markdown', help='文章类型')
-#     parser.add_argument('title', type=str, location='json')
-#     parser.add_argument('author', type=str, default=config.author, location='json')
-#     parser.add_argument('date', location='json',     default=None)
-#     parser.add_argument('modified', location='json', default=None)
-#     parser.add_argument('tags', location='json',   default='')
-#     parser.add_argument('status', location='json', default='published')
-#     parser.add_argument('category', location='json', default=config.default_category)
-#     parser.add_argument('slug', location='json', default=None, help='更易读的链接名')
-#     parser.add_argument('text', location='json',   default='')
-#     args = parser.parse_args()
-#     if args['slug'] is None:
-#         title = args['title']
-#         args['slug'] = slugify(title)
-#
-#     args['date'] = (datetime.datetime.now().strftime(config.date_format)
-#                     if args['date'] is None else args['date'])
-#     args['modified'] = (datetime.datetime.now().strftime(config.date_format)
-#                     if args['modified'] is None else args['modified'])
-#
-#     ext = 'md' if args['type'] == 'markdown' else 'rst'
-#     if args['path'] is None:
-#         args['path'] = '{}.{}'.format(args['title'], ext)
-#     args['location'] = args['path']
-#     args['path'] = os.path.join(config.path or '', args['location'])
-#     return args
 
 def parse_article_args():
     config = Config()
@@ -108,7 +74,7 @@ def filter_api(func):
                     data = {k:v for k, v in data.items() if k in only}
                 data = {k:v for k, v in data.items() if k not in exclude}
                 result.append(data)
-            return {'results':result, 'count': len(result)}
+            return {'results':result, 'total': len(result)}
         else:
             if only:
                 datas = {k:v for k, v in datas.items() if k in only}
@@ -133,7 +99,10 @@ class ArticleAPI(Resource):
             }
             return data
         else:
-            return {'err_code': 100, 'msg': '此文章不存在', 'full_path': full_path}
+            return {'err_code': 100, 'msg': '此文章不存在', 'full_path': article.full_path}
+
+    # def options(self):
+    #     print("OPTIONS=")
 
     def put(self, path):
         ''' 更新指定的文章
@@ -142,9 +111,8 @@ class ArticleAPI(Resource):
         args = request.json
         config = Config()
         text = args.get('text', '')
-        full_path = os.path.join(config.path or '', path)
-
-        article = article_factory(full_path)
+        path = urllib.parse.unquote(path)
+        article = article_factory(path)
         if article.exists() is not True:
             return {'error_msg':'文章不存在'}
 
@@ -154,6 +122,7 @@ class ArticleAPI(Resource):
             meta['modified'] = datetime.datetime.now().strftime(config.date_format)
         article.meta = meta
         article.text = args.get('text', '')
+        print(article.meta)
         article.save()
         return {'msg': '更新成功！'}
 
@@ -161,8 +130,9 @@ class ArticleAPI(Resource):
         ''' 部分更新'''
         args = request.json
         config = Config()
-        full_path = os.path.join(config.path or '', path)
-        article = article_factory(full_path)
+        path = urllib.parse.unquote(path)
+        # full_path = os.path.join(config.path or '', path)
+        article = article_factory(path)
 
         meta = args.get('meta', {})
         for k, v in meta.items():
@@ -172,11 +142,14 @@ class ArticleAPI(Resource):
         article.save()
         return {'msg': 'update success.'}
 
+
     def delete(self, path):
         config = Config()
         full_path = os.path.join(config.path or '', path)
         try:
             os.remove(full_path)
+            dir_, _ = os.path.dirname(full_path)
+            os.removedirs(dir_)
         except:
             pass
         return {'status':'success.'}
@@ -184,17 +157,20 @@ class ArticleAPI(Resource):
 
 
 class ArticleListApi(Resource):
+
+    def options(self):
+        ''' 跨域'''
+        print("OPTIONS.")
+        pass
     '''
     文件扫描规则：
         记录下文件夹的 st_mtime , 并将值和文件列表序列化到文件中，
         当分页时， 如果st_mtime 已修改则重新扫描目录， 重复上述步骤。
     返回值为 生成器， 需要 filter_api 装饰器进一步处理后才可以得到想要的的数据
     '''
-    # @marshal_with(article_list_fields)
     @filter_api
     def get(self):
         config = Config()
-        # paths = [os.path.join(os.getcwd(), config.path)]
         paths = [config.path]
         if config.article_paths:
             for path in config.article_paths:
@@ -203,18 +179,13 @@ class ArticleListApi(Resource):
         for path in paths:
             for full_path in traversal(path):
                 article = article_factory(full_path)
-                if article:
-                    print(article.full_path)
                 if article and article.meta.get('title', None):
-                    print("fullpath => {}".format(article.full_path))
                     data = {
                         'meta': article.meta,
                         'path': article.path,
                         'text': article.text,
-                        # 'full_path': article.full_path
                     }
                     yield data
-
 
     def post(self):
         ''' 创建一个新文章'''

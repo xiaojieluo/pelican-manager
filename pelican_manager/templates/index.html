@@ -1,8 +1,17 @@
 {% extends "layout.html" %}
 
-{% block content %}
-    <h2>Article list.</h2>
+{% macro th(field) -%}
+    {% set config_field = config.SERVER_FIELD[field] %}
+    <th
+    data-field="{{ field }}"
+    data-align="{{ config_field.get('align', 'center') }}"
+    data-sortable="{{ config_field.get('sort', 'true')|lower }}"
+    >{{ config_field.get('text') }}</th>
+{%- endmacro %}
 
+
+{% block content %}
+    <h2>Article list</h2>
     <table data-toggle="table" id="article-lists" class="table table-hover" data-pagination="true"
            data-detail-view="true"
            data-detail-formatter="detailFormatter"
@@ -14,19 +23,19 @@
            data-show-pagination-switch="true"
            data-id-field="id"
            data-click-to-select="false"
+           data-page-size="{{ config.page_size|int(10) }}"
            >
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
-                <th data-field="id" data-align="center" data-sortable="true">No.</th>
+                <!-- <th data-field="id" data-align="center" data-sortable="true">No.</th> -->
                 <th data-field="path" data-align="center" data-sortable="true">file path</th>
-                <th data-field="title" data-align="left" data-sortable="true">Title</th>
-                <th data-field="authors" data-align="center" data-sortable="true">Authors</th>
-                <th data-field="status" data-align="center" data-sortable="true">Status</th>
+                {% for field in config.SERVER_FIELD %}
+                    {{ th(field) }}
+                {% endfor %}
                 <th data-field="action" data-align="center">Action</th>
             </tr>
         </thead>
-
     </table>
 {% endblock %}
 
@@ -35,14 +44,23 @@
     function make_data(){
         var data = []
         {% for article in articles %}
-            var status = function(){
-                return 'published'
-            }
             data.push({
-                "id": {{ loop.index }},
+                // "id": {{ loop.index }},
                 "path": "{{ article.path }}",
-                "title": "{{ article.meta['title'] }}",
-                "authors": "{{ article.meta['authors'] }}",
+                "date": "{{ article.meta['date'] }}",
+                "title": function(){
+                    {% if config.title_color_with_status %}
+                        {% if article.meta['status'] == 'draft' %}
+                            return '<p class="text-{{ config.title_color_with_status_is_draft }}">{{ article.meta['title'] }}</p>'
+                        {% else %}
+                            return '<p class="text-{{ config.title_color_with_status_is_published }}">{{ article.meta['title'] }}</p>'
+                        {% endif %}
+                    {% else %}
+                        return "{{ article.meta['title'] }}"
+                    {% endif %}
+                }(),
+                "author": "{{ article.meta['author'] }}",
+                "modified": "{{ article.meta['modified'] }}",
                 "status": function(){
                     {% if article.meta['status'] == 'draft' %}
                         return '<span class="label label-warning">draft</span>'
@@ -50,7 +68,8 @@
                         return '<span class="label label-success">published</span>'
                     {% endif %}
                 }(),
-                "action": "<a href='{{ url_for('article.edit', path=article.path) }}'>Edit</a>"
+                "action": "<a href='{{ url_for('article.edit', path=article.path) }}'>Edit</a>|  <button type='button' class='btn btn-danger btn-sm'>Delete</button>",
+                "category": "{{ article.meta.get('category', config.default_category) }}"
             })
         {% endfor %}
         return data
@@ -73,6 +92,7 @@
         ]
         console.log(menu)
     }
+
     $(document).ready(function(){
         make_header()
         var $table = $("#article-lists");
@@ -84,9 +104,15 @@
                 onExpandRow: function (index, row, $detail) {
                    $detail.hide().fadeIn('slow');
                  },
+                onColumnSwitch: function(field, checked){
+                    update_hide_column(field, checked)
+                },
             })
-            .bootstrapTable('hideColumn', 'path')
-        console.log(data)
+        {% if config.PAGE_HIDE_COLUMN %}
+            {% for field in config.PAGE_HIDE_COLUMN %}
+                $table.bootstrapTable('hideColumn', '{{ field }}')
+            {% endfor %}
+        {% endif %}
     })
 </script>
 {% endblock %}

@@ -5,7 +5,7 @@
     <div class="col-md-8">
 
 
-    <form class="form-horizontal" method="POST">
+    <form class="form-horizontal">
         {{ form.csrf_token }}
 
       <!-- Title -->
@@ -61,12 +61,45 @@
 
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">Save</button>
+          <button class="btn btn-default" id="save">Save</button>
         </div>
       </div>
     </form>
 
     </div>
 </div>
+{% endblock %}
 
+{% block script %}
+<script type="text/javascript">
+    function getRequest() {
+       var url = location.search; //获取url中"?"符后的字串
+       if (url.indexOf("?") != -1) {    //判断是否有参数
+          var str = url.substr(1); //从第一个字符开始 因为第0个是?号 获取所有除问号的所有符串
+          strs = str.split("=");   //用等号进行分隔 （因为知道只有一个参数 所以直接用等号进分隔 如果有多个参数 要用&号分隔 再用等号进行分隔）
+          // alert(strs[1]);          //直接弹出第一个参数 （如果有多个参数 还要进行循环的）
+          return strs[1]
+       }
+    }
+    $(document).ready(function(){
+        var path = getRequest()
+        $.ajax({
+            url: "/api/articles/"+path,
+            type: "GET",
+            success: function(data){
+                console.log(data)
+            },
+            error: function(data){
+                console.log(data)
+            }
+        })
+        // var url = "/api/articles/"+
+        // $.ajax({
+        //     url: ''
+        // })
+        // $(".save").click(function(){
+        //     console.log("Save.")
+        // })
+    })
+</script>
 {% endblock %}

@@ -3,6 +3,8 @@ from pelican_manager.config import Config
 import sys, os
 
 
+
+
 def back(path):
     text = None
     with open('tests/config/pelicanconf.py', 'r') as fp:
@@ -68,6 +70,10 @@ def test_config_save(config):
         #     text = '\n'.join(lines)
         #     fp.write(text)
 
+
+def test_config():
+    config = Config('tests/pelicanconf.py')
+    print(config._path)
 
 #
 #

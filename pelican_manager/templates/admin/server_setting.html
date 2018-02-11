@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% set active_page = "server_setting" %}
+
+{% macro input(args, type='text', value='', selected=None) -%}
+    <!-- value: 列表类型， [(title, name), (title, name)] -->
+    <!-- selected: 默认的类型 -->
+    <div class="form-group">
+        {{ form[args].label(class="col-sm-2 control-label") }}
+        <div class="col-sm-10">
+            {% if type == 'text' %}
+              <input type="{{ type }}" class="form-control" id="{{ args }}" placeholder="{{ args }}" name="{{ args }}" value="{{ value }}">
+            {% elif type == 'select' %}
+                <select class="form-control" name="{{ args }}">
+                    {% for option in value %}
+                        {% set name, value = option %}
+                        <option value="{{ value }}" {% if value == selected %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        </div>
+    </div>
+{%- endmacro %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+
+    <form class="form-horizontal" method="POST">
+        {{ form.csrf_token }}
+
+      <!-- Title -->
+      <h3>Server</h3>
+      <hr>
+      <!-- debug -->
+      {% set value = [('True', 1), ('False', 0)] %}
+      {{ input('server_debug', type='select', value=value, selected=config.server_debug) }}
+
+      <!-- server port -->
+      {{ input('server_port', value=config.server_port) }}
+
+      <!-- page size -->
+      {{ input('page_size', value=config.page_size) }}
+
+      <!-- page hide columns -->
+      {{ input('page_hide_column', value=config.page_hide_column) }}
+
+      <!-- title_color -->
+      {{ input('title_color_with_status', type='select', value=value, selected=config.title_color_with_status) }}
+
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Save</button>
+        </div>
+      </div>
+    </form>
+
+</div>
+</div>
+
+{% endblock %}

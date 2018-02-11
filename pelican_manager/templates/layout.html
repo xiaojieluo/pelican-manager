@@ -5,13 +5,14 @@
         <title>Pelican-Admin</title>
         <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-table/dist/bootstrap-table.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/pnotify.custom.min.css')}}">
     </head>
     <body>
         <div class="container">
             <nav class="navbar navbar-default">
                 {% set navigation_bar = [
                     (url_for('admin.index'), 'index', 'Index'),
-                    (url_for('admin.settings'), 'setting', 'Setting'),
+                    (url_for('admin.count'), 'count', '统计'),
                 ] -%}
                 <div class="container-fluid">
                     <!-- Brand and toggle get grouped for better mobile display -->
@@ -24,6 +25,12 @@
                             {% for href, id, caption in navigation_bar %}
                                 <li {% if id == active_page %}class="active"{% endif %}><a href="{{ href }}">{{ caption }}</a> </li>
                             {% endfor %}
+                            <li class="dropdown">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">管理 <span class="caret"></span></a>
+                              <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('setting.server') }}">Server Setting</a> </li>
+                              </ul>
+                            </li>
                             <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li> -->
                         </ul>
                     </div>
@@ -52,15 +59,19 @@
             </div>
         </div>
     </body>
+
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.pjax.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='js/nprogress.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='bootstrap-table/dist/bootstrap-table.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='bootstrap-table/dist/locale/bootstrap-table-zh-CN.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='js/pnotify.custom.min.js') }}" charset="utf-8"></script>
     <!-- <script type="text/javascript">
         $(document).pjax('a', '#pjax-container')
         $(document).on('pjax:start', function() { NProgress.start(); });
         $(document).on('pjax:end',   function() { NProgress.done();  });
+        $.pjax.reload('#pjax-container');
     </script> -->
     {% block script %}
 
