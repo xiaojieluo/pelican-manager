@@ -34,12 +34,19 @@
                         :active-name="active_name" theme="light" width="auto" :open-names="['articles']"
                         @on-select="sidemenu_select"
                         >
+                        <Submenu name="dashboard">
+                            <template slot="title">
+                              <Icon type="ios-bookmarks"></Icon>
+                              Dashboard
+                            </template>
+                            <MenuItem name="Home">Home</MenuItem>
+                        </Submenu>
                         <Submenu name="article">
                             <template slot="title">
                                 <Icon type="ios-bookmarks"></Icon>
                                 文章
                             </template>
-                            <MenuItem name="articles_all">所有文章</MenuItem>
+                            <MenuItem name="ArticleAll">所有文章</MenuItem>
                             <MenuItem name="articles_write">写文章</MenuItem>
                             <MenuItem name="1-2">分类目录</MenuItem>
                             <MenuItem name="1-3">标签</MenuItem>
@@ -78,20 +85,22 @@
 </template>
 
 <script>
-// import 'bootstrap'
 export default {
   name: 'App',
   data () {
-        active_name: 'articles_all'  
+      return {
+           active_name: 'Home'
+      }
   },
   methods: {
       sidemenu_select: function(name){
           // 侧边栏点击事件
           console.log(name)
           this.active_name = name
-          if (name == 'articles_all') {
-              this.$router.push({path: '/articles'})
-          }
+          // if (name == 'articles_all') {
+          //     this.$router.push({path: '/articles'})
+          // }
+          this.$router.push({ name: name })
       }
   }
 }

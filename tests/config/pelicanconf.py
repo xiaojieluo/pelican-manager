@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'Xiaojie Luo'
+AUTHOR = 'Xiaoji'
 SITENAME = "llnhhy's Blog"
 SITEURL = 'http://www.llnhhy.com'
 PATH = 'content'
@@ -113,3 +113,6 @@ SITE = dict(
 
 
 COPYRIGHT = '&copy; 2017-2018 Powered by <a href="https://blog.getpelican.com/" target="_blank">Pelican</a> Theme &copy; <a href="https://github.com/xiaojieluo" target="_blank">LuoXiaojie</a>'
+
+TESTLIST = ['1', '2']
+TESTDICT = {}

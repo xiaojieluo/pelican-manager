@@ -2,7 +2,7 @@ from flask import current_app, Blueprint, request, abort
 # from flask_restful import Resource, Api
 from pelican_manager.config import Config
 from pelican_manager.article import article_factory
-from pelican_manager.utils import traversal
+from pelican_manager.utils import iterdir
 import os
 from flask_restplus import Resource, Api, reqparse, marshal_with, cors
 import datetime
@@ -12,6 +12,7 @@ from .fields import article_list_fields, article_fields
 import types
 from schema import Schema
 import urllib.parse
+from pathlib import Path
 
 app = current_app
 article_api = Blueprint('article_api', __name__, url_prefix='/api/articles')
@@ -31,14 +32,14 @@ def parse_article_args():
     if meta.get('slug', None) is None:
         title = meta.get('title', '')
         meta['slug'] = slugify(title)
-    meta['date'] = meta.get('date', datetime.datetime.now().strftime(config.date_format))
-    meta['modified'] = meta.get('modified', datetime.datetime.now().strftime(config.date_format))
+    meta['date'] = meta.get('date', datetime.datetime.now().strftime(config.default_date_format))
+    meta['modified'] = meta.get('modified', datetime.datetime.now().strftime(config.default_date_format))
 
     ext = 'md' if args['type'] == 'markdown' else 'rst'
-    args['path'] = args.get('path', '{}.{}'.format(meta.get('title', ''), ext))
-    args['location'] = args['path']
-    args['path'] = os.path.join(config.path or '', args['location'])
+    args['location'] = args.get('path', '{}.{}'.format(meta.get('title', ''), ext))
+    args['path'] = args['location']
     args['meta'] = meta
+    print(args)
     return args
 
 def cache(func):
@@ -87,10 +88,13 @@ class ArticleAPI(Resource):
     @filter_api
     def get(self, path):
         config = Config()
+        # print(path)
         # full_path = os.path.join(config.path or '', path)
 
         # article = article_factory(full_path)
         article = article_factory(path)
+        if article is None:
+            return {'err_code': 101, 'msg': '此格式暂不支持'}
         if os.path.exists(article.full_path):
             data = {
                 'meta': article.meta,
@@ -100,9 +104,6 @@ class ArticleAPI(Resource):
             return data
         else:
             return {'err_code': 100, 'msg': '此文章不存在', 'full_path': article.full_path}
-
-    # def options(self):
-    #     print("OPTIONS=")
 
     def put(self, path):
         ''' 更新指定的文章
@@ -177,7 +178,7 @@ class ArticleListApi(Resource):
                 paths = list(map(lambda p: os.path.join(p, path), paths))
         articles = []
         for path in paths:
-            for full_path in traversal(path):
+            for full_path in iterdir(path):
                 article = article_factory(full_path)
                 if article and article.meta.get('title', None):
                     data = {
@@ -185,6 +186,7 @@ class ArticleListApi(Resource):
                         'path': article.path,
                         'text': article.text,
                     }
+                    # print(data)
                     yield data
 
     def post(self):

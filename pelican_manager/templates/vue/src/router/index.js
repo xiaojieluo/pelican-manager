@@ -3,11 +3,24 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Index from '@/components/article/Index'
 import ArticleEdit from '@/components/article/Edit'
+import Dashboard from '@/components/dashboard/dashboard'
+import Home from '@/components/dashboard/home'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
+      {
+          path: '/dashboard',
+          component: Dashboard,
+          children: [
+              { path: 'home', name: 'Home', component: Home}
+          ]
+      },
+      // {
+      //     path: '/dashboard',
+      //     component
+      // }
     {
       path: '/',
       name: 'HelloWorld',
@@ -15,7 +28,7 @@ export default new Router({
   },
   {
       path: '/articles/',
-      name: 'ArticleIndex',
+      name: 'ArticleAll',
       component: Index
   },
   {

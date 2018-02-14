@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'Xiaojie Luo'
+AUTHOR = 'Xiaoji2'
 SITENAME = "llnhhy's Blog"
-SITEURL = 'http://www.llnhhy.com'
+SITEURL = 'Test'
 PATH = 'tests/content'
 PELICANTOOL_PATH = 'content/posts'
 
 TIMEZONE = 'Asia/Shanghai'
 
-DEFAULT_LANG = 'zh'
+DEFAULT_LANG = 'en'
 
 # 将 资源文件与文章文件混合在同一文件夹中
 STATIC_PATHS = [
@@ -114,10 +114,5 @@ SITE = dict(
 
 COPYRIGHT = '&copy; 2017-2018 Powered by <a href="https://blog.getpelican.com/" target="_blank">Pelican</a> Theme &copy; <a href="https://github.com/xiaojieluo" target="_blank">LuoXiaojie</a>'
 
-SERVER_DEBUG = True
-# Server running port.
-SERVER_PORT = 5000
-
-PAGE_SIZE = 5
-PAGE_HIDE_COLUMN = ['path', 'category']
-TITLE_COLOR_WITH_STATUS = True
+TESTLIST = ['1', '2', '3']
+TESTDICT = {'fuck': 'fucksss'}

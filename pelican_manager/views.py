@@ -1,6 +1,6 @@
 from flask import (current_app, render_template, url_for, request, Blueprint,
                     flash, redirect,abort)
-from pelican_manager.utils import traversal
+from pelican_manager.utils import iterdir
 import sys, os
 from pelican_manager.article import article_factory
 from pelican_manager.forms import ArticleForm, SettingForm, ServerSettingForm
