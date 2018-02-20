@@ -6,6 +6,7 @@ import router from './router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import axios from 'axios'
+import store from './store/index'
 
 Vue.use(iView)
 Vue.prototype.$ajax = axios
@@ -16,6 +17,7 @@ new Vue({
   router,
   components: { App },
   template: '<App/>',
+  store,
   // mounted: function(){
   //     console.log($)
   //     console.log(bootstrapTable)

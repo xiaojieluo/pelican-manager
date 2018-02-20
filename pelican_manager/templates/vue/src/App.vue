@@ -51,13 +51,13 @@
                             <MenuItem name="1-2">分类目录</MenuItem>
                             <MenuItem name="1-3">标签</MenuItem>
                         </Submenu>
-                        <Submenu name="2">
+                        <Submenu name="options">
                             <template slot="title">
                                 <Icon type="ios-keypad"></Icon>
-                                Item 2
+                                设置
                             </template>
-                            <MenuItem name="2-1">Option 1</MenuItem>
-                            <MenuItem name="2-2">Option 2</MenuItem>
+                            <MenuItem name="options_general">常规</MenuItem>
+                            <MenuItem name="options_published">发布设置</MenuItem>
                         </Submenu>
                         <Submenu name="3">
                             <template slot="title">

@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'Xiaoji2'
-SITENAME = "llnhhy's Blog"
-SITEURL = 'Test'
-PATH = 'tests/content'
+AUTHOR = "Xiaojie Luo"
+SITENAME = "llnhhy"
+SITEURL = "http://127.0.0.1:8080"
+PATH = "tests/content"
 PELICANTOOL_PATH = 'content/posts'
 
-TIMEZONE = 'Asia/Shanghai'
+TIMEZONE = "Asia/Shanghai"
 
 DEFAULT_LANG = 'en'
 
@@ -38,16 +38,16 @@ PLUGINS = [
     'render_math',
     ]
 SITEMAP = {
-    'format': 'xml',
-    'priorities': {
-        'articles': 0.5,
-        'indexes': 0.5,
-        'pages': 0.5
+    "format": "xml",
+    "priorities": {
+        "articles": 0.5,
+        "indexes": 0.5,
+        "pages": 0.5
     },
-    'changefreqs': {
-        'articles': 'monthly',
-        'indexes': 'daily',
-        'pages': 'monthly'
+    "changefreqs": {
+        "articles": "monthly",
+        "indexes": "daily",
+        "pages": "monthly"
     }
 }
 
@@ -87,7 +87,7 @@ THEME_LINKS = (
                 ('Linkedin','http://linkedin.com/'),)
 
 # DEFAULT_DATE_FORMAT = '%B %d %Y'
-DEFAULT_DATE_FORMAT = '%Y-%d-%b'
+DEFAULT_DATE_FORMAT = "%Y-%d-%b"
 # 所在国家
 COUNTRY = 'China'
 # 所在城市
@@ -113,6 +113,3 @@ SITE = dict(
 
 
 COPYRIGHT = '&copy; 2017-2018 Powered by <a href="https://blog.getpelican.com/" target="_blank">Pelican</a> Theme &copy; <a href="https://github.com/xiaojieluo" target="_blank">LuoXiaojie</a>'
-
-TESTLIST = ['1', '2', '3']
-TESTDICT = {'fuck': 'fucksss'}

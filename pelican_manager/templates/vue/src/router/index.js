@@ -5,6 +5,9 @@ import Index from '@/components/article/Index'
 import ArticleEdit from '@/components/article/Edit'
 import Dashboard from '@/components/dashboard/dashboard'
 import Home from '@/components/dashboard/home'
+import Option from '@/components/options/options'
+import optionsGeneral from '@/components/options/general'
+import optionsPublished from '@/components/options/published'
 
 Vue.use(Router)
 
@@ -15,6 +18,14 @@ export default new Router({
           component: Dashboard,
           children: [
               { path: 'home', name: 'Home', component: Home}
+          ]
+      },
+      {
+          path: 'options',
+          component: Option,
+          children: [
+              { path: 'general', name: 'options_general', component: optionsGeneral },
+              { path: 'published', name: 'options_published', component: optionsPublished },
           ]
       },
       // {

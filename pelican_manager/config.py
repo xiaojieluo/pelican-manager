@@ -5,6 +5,8 @@ from pelican.settings import DEFAULT_CONFIG, get_settings_from_file, get_setting
 from unipath import Path
 import tempfile
 import importlib
+import pprint
+import json
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -56,6 +58,7 @@ class Config(object):
             path = self.config_file
         self._path = path
         self._pelicanconf = get_settings_from_file(self._path)
+        self._baron = None
 
     def set(self, key, value):
         self.__dict__[key] = value
@@ -85,149 +88,82 @@ class Config(object):
         '''
         return self.set(key, value)
 
+    def delete(self, key):
+        ''' 删除 key 配置变量'''
+        index = self.find_baron(key.upper())
+        if index:
+            del self.baron[index]
+            print(self.baron)
+            self.save()
+
+    def find_baron(self, key):
+        ''' 从 redbaron 中提取配置'''
+        not_found = True
+        index = None
+        red = self.baron
+        for i in range(0, len(red)):
+            try:
+                target = red[i].target.value
+            except:
+                target = ''
+            if target == key:
+                not_found = False
+                index = i
+
+        return index
+
+    @property
+    def baron(self):
+        if not self._baron:
+            with open(self._path, 'r') as fp:
+                text = fp.read()
+            red = RedBaron(text)
+            self._baron = red
+
+        return self._baron
+
     def save(self):
         ''' 保存配置到 self._path '''
         keys = [k for k in self.__dict__.keys() if k[0] != '_']
-        with open(self._path, 'r') as fp:
-            text = fp.read()
-
-        red = RedBaron(text)
+        red = self.baron
         for key in keys:
-            key = key.upper()
+            up_key = key.upper()
+            not_found = True
             for i in range(0, len(red)):
                 try:
                     target = red[i].target.value
                 except:
                     target = ''
-                if target == key:
-                    value = self.__dict__[key.lower()]
+                if target == up_key:
+                    not_found = False
+                    value = self.__dict__[key]
                     if isinstance(value, str):
-                        value = "'{}'".format(value)
+                        value = '"{}"'.format(value)
+                    elif isinstance(value, dict):
+                        # value = "{}".format(value)
+                        print("DICT")
+                        # multi = json.loads(value)
+                        value = json.dumps(value, indent=4)
+                        print(value)
+                        # value = dumps(value)
                     else:
                         value = "{}".format(value)
                     red[i].value = value
+
+            if not_found:
+                # 不存在， 在末尾新增
+                format_ = '{key} = "{value}"'.format(key = key.upper(), value = self.__dict__[key])
+                red.append(format_)
+
 
         with open(self._path, 'w') as fp:
             text = red.dumps()
             fp.write(text)
 
+        # 清除缓存
+        self._baron = None
+
 
     @classmethod
     def monkey_patch(cls, path):
         cls.config_file = path
-
-
-
-
-# class Config_bak(object):
-#     # monkey patch
-#     # 保存从命令行传入的 config file path
-#     config_file = None
-#
-#     def __init__(self, path = None):
-#         if path is None:
-#             path = os.path.join(os.getcwd(), 'pelicanconf.py')
-#         if self.config_file:
-#             path = self.config_file
-#
-#         self._path = path
-#         self._pelicanconf = self.make_config(path, 'pelicanconf')
-#         here = os.path.abspath(os.path.dirname(__file__))
-#         default_path = os.path.join(here, 'config/defaultconf.py')
-#         self._default = self.make_config(default_path, 'defaultconf')
-#
-#
-#     @classmethod
-#     def monkey_patch(cls, path):
-#         cls.config_file = path
-#
-#     @property
-#     def base_path(self):
-#         print(self._path)
-#
-#
-#     def set(self, key, value):
-#         self.__dict__[key] = value
-#
-#     def get(self, key, default = None):
-#         '''从 pelicanconf.py 中取出配置
-#         Args:
-#             key: 要取出的变量名
-#             default: 配置不存在时的默认值
-#         '''
-#         key = key.upper()
-#         if key in self._pelicanconf.__dir__():
-#             return getattr(self._pelicanconf, key)
-#         elif key in self._default.__dir__():
-#             return getattr(self._default, key)
-#         return default
-#
-#     @property
-#     def date_format(self):
-#         ''' 日期格式'''
-#         locale = self.get('default_lang', 'en')
-#         date_format = self.get('date_format')
-#         if date_format and locale in date_format:
-#             return date_format[locale]
-#         else:
-#             return self.get('default_date_format')
-#
-#     def update(self, key, value):
-#         '''更新配置
-#         '''
-#         return self.set(key, value)
-#
-#     def save(self):
-#         ''' 保存环境变量到 self._path 路径'''
-#         update = []
-#         lines = []
-#         # if os.path.exists(self._path):
-#         with open(self._path, 'r') as fp:
-#             lines = fp.read().split('\n')
-#
-#         for key, value in list(self.__dict__.items()):
-#             # 排除掉开头为下划线的内部变量
-#             if key[0] != '_':
-#                 key = key.upper()
-#                 if key == 'page_hide_column':
-#                     value = ','.split(value)
-#                 def filter_func(line):
-#                     match = re.match(r'^{}(\s.*)=(.*)'.format(key), line)
-#                     if match:
-#                         return True
-#                 result = list(filter(filter_func, lines))
-#                 if isinstance(value, str):
-#                     value = '\'{}\''.format(value)
-#                 attribute = '{key} = {value}'.format(key=key, value=value)
-#                 if result:
-#                     index = lines.index(result[0])
-#                     lines[index] = attribute
-#                 else:
-#                     if key == 'SERVER_PORT':
-#                         lines.append('# Server running port.')
-#                     lines.append(attribute)
-#                 # 删除更新过的 key
-#                 try:
-#                     del self.__dict__[key.lower()]
-#                 except KeyError as e:
-#                     del self.__dict__[key.upper()]
-#                 else:
-#                     print("未知 key:{}".format(key))
-#
-#         text = '{}'.format(os.linesep).join(lines)
-#         with open(self._path, 'w+') as fp:
-#             fp.write(text)
-#
-#     def make_config(self, path, name):
-#         '''make config'''
-#         pelicanconf = import_module(name, path)
-#         return pelicanconf
-#
-#     def __getattr__(self, key):
-#         return self.get(key)
-#
-#     def __setattr__(self, key, value):
-#         self.set(key, value)
-#
-#     def __getitem__(self, key):
-#         return self.get(key)
